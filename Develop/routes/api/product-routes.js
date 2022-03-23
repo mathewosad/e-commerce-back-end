@@ -6,73 +6,74 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 // get all products
 router.get('/', (req, res) => {
   // find all products
-    Product.findAll(req.body)
-    .then((product) => {
-      // if there's product tags, we need to create pairings to bulk create in the ProductTag model
-      if (req.body.tagIds.length) {
-        const productTagIdArr = req.body.tagIds.map((tag_id) => {
-          return {
-            product_id: product.id,
-            tag_id,
-          };
-        });
-        return ProductTag.bulkCreate(productTagIdArr);
+  Product.findAll({
+    // be sure to include its associated Category and Tag data
+    attributes: [
+      'id',
+      'product_name', 
+      'price', 
+      'stock'
+    ],
+    include: [
+      {
+        model: Category,
+        attributes: [
+          'category_name'
+        ]
+      },
+      {
+        model: Tag,
+        attributes: [
+          'tag_name'
+        ]
       }
-      // if no product tags, just respond
-      res.status(200).json(product);
+    ]
+  }).then(dbProData => res.json(dbProData))
+    .catch(err => {
+      console.log(err)
+      res.status(500).json(err)
     })
-    .then((productTagIds) => res.status(200).json(productTagIds))
-    .catch((err) => {
-      console.log(err);
-      res.status(400).json(err);
-    });
-  //     attr: ['id', 'product_name', 'price', 'stock'],
-  //       // be sure to include its associated Products
-  //     include: [
-  //       {
-  //         model: Category,
-  //         attributes: ['category_name']
-  //       },
-  //       {
-  //         model: Tag,
-  //         attributes: ['tag_name']
-  //       }]
-    
-  //   });
-  //   res.status(200).json(ProductData);
-  // } catch (err) {
-  //   res.status(500).json(err);
-  // }  
-});
+})
 
 // get one product
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
-  try {
-    // const ProductData = await 
-  Product.findone({
-      attr: ['id', 'product_name', 'price', 'stock'],
-        // be sure to include its associated Products
-      include: [
-        {
-          model: Category,
-          attributes: ['category_name']
-        },
-        {
-          model: Tag,
-          attributes: ['tag_name']
-        }]
+  Product.findOne({
+    where: {
+      id: req.params.id
+    },
+    attributes: [
+    // be sure to include its associated Category and Tag data
+      'id', 
+      'product_name', 
+      'price', 
+      'stock'
+    ],
+    include: [
+      {
+        model: Category,
+        attributes: [
+          'category_name'
+        ]
+      },
+      {
+        model: Tag,
+        attributes: [
+          'tag_name'
+        ]
+      }
+    ]
+  }).then(dbProData => {
+      if (!dbProData) {
+        res.status(404).json({ message: 'ID does not match with product' });
+        return;
+      }
+      res.json(dbProData);
+    }).catch(err => {
+      console.log(err);
+      res.status(500).json(err);
     });
-
-    if (!ProductData) {
-      res.status(404).json({ message: 'Product Not found' });
-      return;
-    }
-
-    res.status(200).json(ProductData);
-  } catch (err) {
-    res.status(500).json(err);
-  }});
+});
 
 // create new product
 router.post('/', (req, res) => {
@@ -150,23 +151,20 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
-  try {
-    // const ProductData = await
-   Product.destroy({
+  Product.destroy({
       where: {
         id: req.params.id
       }
-    });
-
-    if (!ProductData) {
-      res.status(404).json({ message: 'Product Not found' });
-      return;
-    }
-
-    res.status(200).json(ProductData);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+    }).then(dbProData => {
+        if (!dbProData){
+          res.status(404).json({ message: 'ID did not match with a product' })
+          return
+        }
+        res.json(dbProData)
+      }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+      })
 });
 
 module.exports = router;
