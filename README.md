@@ -1,5 +1,5 @@
 # e-commerce-back-end
-# Employee-Management-System
+
 
 ![License Badge](https://img.shields.io/github/license/mathewosad/Employee-Management-System) ![Top Language](https://img.shields.io/github/languages/top/mathewosad/Employee-Management-System)
 
@@ -22,12 +22,11 @@ A command line application Content Management Systems for managing a company's e
 * [Video Demo](https://drive.google.com/file/d/12H49_vPh0I2gxUsZcU03W2d8qWpUHAOi/view)
 
 * Website
-  * [Github](https://github.com/mathewosad/Employee-Management-System)
+  * [Github](https://github.com/mathewosad/e-commerce-back-end)
 
 ## Features
 
 * JavaScript
-* Node.js
 * MySQL
 * npm packages
 
